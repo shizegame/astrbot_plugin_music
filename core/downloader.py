@@ -45,10 +45,21 @@ class Downloader:
 
     async def download_song(self, url: str) -> Path | None:
         """下载歌曲，返回保存路径"""
+        logger.debug(f"开始下载歌曲，URL: {url}")
         song_uuid = uuid.uuid4().hex
         file_path = self.songs_dir / f"{song_uuid}.mp3"
         try:
-            async with self.session.get(url) as response:
+            # 添加请求头
+            headers = {
+                "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36",
+                "Accept": "audio/*",
+                "Accept-Language": "zh-CN,zh;q=0.9",
+                "Referer": "https://www.google.com/"
+            }
+            logger.debug(f"使用 headers: {headers}")
+            async with self.session.get(url, headers=headers) as response:
+                logger.debug(f"下载响应状态码: {response.status}")
+                logger.debug(f"响应头: {dict(response.headers)}")
                 if response.status != 200:
                     logger.error(f"歌曲下载失败，HTTP 状态码：{response.status}")
                     return None

@@ -276,6 +276,8 @@ class MusicSender:
             f"{event.get_sender_name()}（{event.get_sender_id()}）点歌："
             f"{player.platform.display_name} -> {song.name}_{song.artists}"
         )
+        # 打印当前 Song 对象的音频 URL
+        logger.debug(f"初始音频 URL: {song.audio_url}")
 
         sent = False
         target_modes = modes if modes is not None else self.cfg.real_send_modes

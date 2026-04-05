@@ -126,14 +126,19 @@ class TXQQMusic(BaseMusicPlayer):
             return []
         songs = []
         for s in result["data"]:
-            songs.append(
-                Song(
-                    id=s.get("songid"),
-                    name=s.get("title"),
-                    artists=s.get("author"),
-                    audio_url=s.get("url") or s.get("link"),
-                    cover_url=s.get("pic"),
-                    lyrics=s.get("lrc", ""),
-                )
+            # 打印原始数据
+            logger.debug(f"TXQQ API 原始数据: {s}")
+            # 创建 Song 对象
+            song = Song(
+                id=s.get("songid"),
+                name=s.get("title"),
+                artists=s.get("author"),
+                audio_url=s.get("url") or s.get("link"),
+                cover_url=s.get("pic"),
+                lyrics=s.get("lrc", ""),
             )
+            # 打印创建的 Song 对象
+            logger.debug(f"创建的 Song 对象: {song}")
+            logger.debug(f"音频 URL: {song.audio_url}")
+            songs.append(song)
         return songs[:limit]

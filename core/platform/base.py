@@ -65,14 +65,27 @@ class BaseMusicPlayer(ABC):
     # ---------- 可复用方法 ----------
     async def fetch_extra(self, song: Song) -> Song:
         """默认获取额外信息的实现"""
+        logger.debug(f"fetch_extra 被调用，当前音频 URL: {song.audio_url}")
+        logger.debug(f"歌曲 ID: {song.id}")
+        
+        # 如果已经有音频 URL，直接返回
+        if song.audio_url:
+            logger.debug("音频 URL 已存在，直接返回")
+            return song
+        
         url = f"https://api.qijieya.cn/meting/?type=song&id={song.id}"
+        logger.debug(f"请求额外信息的 URL: {url}")
 
         result = await self._request(url)
+        logger.debug(f"额外信息请求结果: {result}")
 
         if result and isinstance(result, list) and len(result) > 0:
             data = result[0]
+            logger.debug(f"额外信息数据: {data}")
             if not song.audio_url:
-                song.audio_url = data.get("url")
+                new_url = data.get("url")
+                logger.debug(f"从额外信息获取的新音频 URL: {new_url}")
+                song.audio_url = new_url
             if not song.cover_url:
                 song.cover_url = data.get("pic")
             if not song.lyrics:
