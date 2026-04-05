@@ -131,6 +131,13 @@ class MusicSender:
         self, event: AstrMessageEvent, player: BaseMusicPlayer, song: Song
     ) -> bool:
         """发语音"""
+        platform = event.get_platform_name()
+        # 对于 QQ 官方平台，使用文件发送方式替代语音发送
+        # 因为 QQ 官方平台要求语音文件必须是 WAV 格式（带有 RIFF 头）
+        if platform in {"qq_official", "qq_official_webhook"}:
+            logger.debug(f"QQ 官方平台使用文件发送替代语音发送")
+            return await self.send_file(event, player, song)
+        
         if not song.audio_url:
             song = await player.fetch_extra(song)
         if not song.audio_url:
